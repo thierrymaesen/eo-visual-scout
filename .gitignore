@@ -1,0 +1,48 @@
+# === Python === #
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# === Virtual environments === #
+.venv/
+venv/
+ENV/
+env/
+
+# === IDE === #
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === Testing / Coverage === #
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# === Environment variables === #
+.env
+.env.*
+
+# === Data artifacts === #
+data/*.npz
+data/eurosat/
+
+# === OS === #
+.DS_Store
+Thumbs.db
+
+# === Jupyter === #
+.ipynb_checkpoints/
+
+# === Poetry === #
+poetry.lock
