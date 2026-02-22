@@ -13,21 +13,21 @@ repository = "https://github.com/thierrymaesen/eo-visual-scout"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-sentence-transformers = "^2.2.2"
-datasets = "^2.14.0"
-pillow = "^10.0.0"
-numpy = "^1.24.0"
-fastapi = "^0.109.0"
-uvicorn = {extras = ["standard"], version = "^0.27.0"}
-gradio = "^4.16.0"
-pydantic = "^2.5.0"
-tqdm = "^4.66.0"
+sentence-transformers = ">=3.0.0,<6.0.0"
+datasets = ">=2.14.0"
+pillow = ">=10.0.0"
+numpy = ">=1.24.0"
+fastapi = ">=0.109.0"
+uvicorn = {extras = ["standard"], version = ">=0.27.0"}
+gradio = ">=4.16.0"
+pydantic = ">=2.5.0"
+tqdm = ">=4.66.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-pytest-cov = "^4.1.0"
-ruff = "^0.1.0"
-black = "^24.0.0"
+pytest = ">=7.4.0"
+pytest-cov = ">=4.1.0"
+ruff = ">=0.1.0"
+black = ">=24.0.0"
 
 [tool.poetry.scripts]
 eovs-ingest = "eovs.ingest:main"
