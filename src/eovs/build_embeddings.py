@@ -18,9 +18,7 @@ from tqdm import tqdm
 
 # ── Constants ──────────────────────────────────────────────────────────
 
-MODEL_NAME = (
-    "sentence-transformers/clip-ViT-B-32-multilingual-v1"
-)
+MODEL_NAME = "sentence-transformers/clip-ViT-B-32-multilingual-v1"
 DEFAULT_DATA_DIR = Path("data/eurosat")
 BATCH_SIZE = 32
 
@@ -28,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 # ── Helpers ────────────────────────────────────────────────────────────
+
 
 def setup_logging(verbose: bool) -> None:
     """Configure root logger level and format."""
@@ -50,9 +49,7 @@ def load_metadata(
         If the metadata file does not exist.
     """
     if not metadata_path.exists():
-        raise FileNotFoundError(
-            f"Metadata file not found: {metadata_path}"
-        )
+        raise FileNotFoundError(f"Metadata file not found: {metadata_path}")
     with metadata_path.open("r", encoding="utf-8") as fh:
         data: List[Dict[str, Any]] = json.load(fh)
     logger.info("Loaded %d records from %s", len(data), metadata_path)
@@ -60,6 +57,7 @@ def load_metadata(
 
 
 # ── Core ───────────────────────────────────────────────────────────────
+
 
 def build_image_embeddings(
     data_dir: Path,
@@ -83,9 +81,7 @@ def build_image_embeddings(
 
     # Skip if already computed
     if output_npz.exists() and not force:
-        logger.info(
-            "Embeddings already exist. Use --force."
-        )
+        logger.info("Embeddings already exist. Use --force.")
         return
 
     # Load metadata
@@ -93,9 +89,7 @@ def build_image_embeddings(
 
     # Validate images directory
     if not images_dir.is_dir():
-        raise FileNotFoundError(
-            f"Images directory not found: {images_dir}"
-        )
+        raise FileNotFoundError(f"Images directory not found: {images_dir}")
 
     # Load model
     model = SentenceTransformer(MODEL_NAME)
@@ -129,9 +123,7 @@ def build_image_embeddings(
             img.close()
 
     embeddings_matrix = np.vstack(all_embeddings)
-    np.savez_compressed(
-        output_npz, embeddings=embeddings_matrix
-    )
+    np.savez_compressed(output_npz, embeddings=embeddings_matrix)
     logger.info(
         "Saved matrix of shape %s to %s",
         embeddings_matrix.shape,
@@ -140,6 +132,7 @@ def build_image_embeddings(
 
 
 # ── CLI ────────────────────────────────────────────────────────────────
+
 
 def main() -> None:
     """Parse arguments and launch the embedding pipeline."""
