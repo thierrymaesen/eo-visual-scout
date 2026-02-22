@@ -25,17 +25,22 @@ poetry install
 ```bash
 # Ingest EuroSAT dataset (Sprint 1)
 python -m eovs.ingest --verbose
-python -m eovs.ingest --limit 100 --verbose   # quick test with 100 images
+python -m eovs.ingest --limit 100 --verbose  # quick test with 100 images
+
+# Build CLIP image embeddings (Sprint 2)
+python -m eovs.build_embeddings --verbose
+python -m eovs.build_embeddings --force -v   # re-generate embeddings
 
 # Dev commands
-poetry run pytest tests/ -v          # run tests
-poetry run ruff check src/ tests/    # lint
-poetry run black src/ tests/ app/    # format
+poetry run pytest tests/ -v        # run tests
+poetry run ruff check src/ tests/  # lint
+poetry run black src/ tests/ app/  # format
 ```
 
 ## Status
 
-🚧 **Sprint 1 / 10 — Completed** — EuroSAT dataset ingestion pipeline.
+✅ **Sprint 1 / 10 — Completed** — EuroSAT dataset ingestion pipeline.
+✅ **Sprint 2 / 10 — Completed** — CLIP image embeddings generation.
 
 ## License
 
