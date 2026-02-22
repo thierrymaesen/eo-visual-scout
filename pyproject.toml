@@ -30,7 +30,7 @@ ruff = "^0.1.0"
 black = "^24.0.0"
 
 [tool.poetry.scripts]
-eovs-test = "pytest:main"
+eovs-ingest = "eovs.ingest:main"
 
 [tool.ruff]
 line-length = 100
