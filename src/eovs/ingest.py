@@ -67,9 +67,7 @@ def ingest_eurosat(
 
     try:
         # Load dataset from Hugging Face ------------------------------------
-        logger.info(
-            "Loading dataset '%s' from Hugging Face…", HF_DATASET_NAME
-        )
+        logger.info("Loading dataset '%s' from Hugging Face…", HF_DATASET_NAME)
         ds = load_dataset(HF_DATASET_NAME, split="train")
         class_names: List[str] = ds.features["label"].names
         logger.info("Found %d classes: %s", len(class_names), class_names)
@@ -77,9 +75,7 @@ def ingest_eurosat(
         metadata: List[Dict[str, Any]] = []
         total: int = len(ds) if limit is None else min(limit, len(ds))
 
-        for index, item in enumerate(
-            tqdm(ds, total=total, desc="Ingesting images")
-        ):
+        for index, item in enumerate(tqdm(ds, total=total, desc="Ingesting images")):
             if limit is not None and index >= limit:
                 break
 
@@ -113,9 +109,7 @@ def ingest_eurosat(
         )
 
     except Exception:
-        logger.critical(
-            "Failed to ingest dataset '%s'", HF_DATASET_NAME, exc_info=True
-        )
+        logger.critical("Failed to ingest dataset '%s'", HF_DATASET_NAME, exc_info=True)
         raise
 
 
