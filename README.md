@@ -23,6 +23,11 @@ poetry install
 ## Usage
 
 ```bash
+# Ingest EuroSAT dataset (Sprint 1)
+python -m eovs.ingest --verbose
+python -m eovs.ingest --limit 100 --verbose   # quick test with 100 images
+
+# Dev commands
 poetry run pytest tests/ -v          # run tests
 poetry run ruff check src/ tests/    # lint
 poetry run black src/ tests/ app/    # format
@@ -30,7 +35,7 @@ poetry run black src/ tests/ app/    # format
 
 ## Status
 
-🚧 **Sprint 0 / 10 — Completed** — Project scaffolding & configuration.
+🚧 **Sprint 1 / 10 — Completed** — EuroSAT dataset ingestion pipeline.
 
 ## License
 
