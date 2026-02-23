@@ -48,6 +48,8 @@ poetry run black src/ tests/ app/ # format
 ✅ **Sprint 3 / 10 — Completed** — Semantic search engine (SemanticSearcher + CLI).
 ✅ **Sprint 4 / 10 — Completed** — FastAPI server (REST API).
 ✅ **Sprint 5 / 10 — Completed** — Gradio frontend (semantic image search UI).
+✅ **Sprint 6 / 10 — Completed** — Unit tests & evaluation (Pytest).
+✅ **Sprint 7 / 10 — Completed** — Continuous Integration (GitHub Actions CI pipeline).
 
 ## License
 
