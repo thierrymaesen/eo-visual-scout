@@ -158,7 +158,7 @@ with gr.Blocks(
     gr.Markdown(
         "<div style='text-align:center;opacity:.6;margin-top:1.5em'>"
         "Powered by CLIP &amp; EuroSAT Dataset "
-        "| \U0001f680 Spacebel Portfolio Project"
+        "| \U0001f680 Space EO Visual Scout Portfolio Project - By Thierry Maesen "
         "</div>"
     )
 
