@@ -43,9 +43,10 @@ poetry run black src/ tests/ app/ # format
 
 ## Status
 
-✅ **Sprint 1 / 10 — Completed** — EuroSAT dataset ingestion pipeline.
+✅ **Sprint 1 / 10 — Completed** — EuroSAT datashet ingestion pipeline.
 ✅ **Sprint 2 / 10 — Completed** — CLIP image embeddings generation.
 ✅ **Sprint 3 / 10 — Completed** — Semantic search engine (SemanticSearcher + CLI).
+✅ **Sprint 4 / 10 — Completed** — FastAPI server (REST API).
 
 ## License
 
