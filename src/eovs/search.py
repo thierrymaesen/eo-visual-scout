@@ -130,7 +130,7 @@ class SemanticSearcher:
                 SearchResult(
                     id=idx_int,
                     filename=meta["filename"],
-                    class_name=meta["class"],
+                    class_name=meta["class_name"],
                     score=round(float(cos_scores_np[idx_int]), 4),
                 )
             )
