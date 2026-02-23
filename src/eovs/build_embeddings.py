@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 import numpy as np
-from PIL import Image
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
