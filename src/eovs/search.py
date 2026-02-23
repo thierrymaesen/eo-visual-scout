@@ -70,9 +70,7 @@ class SemanticSearcher:
         # --- guard: required files -----------------------------------
         for path in (meta_path, npz_path):
             if not path.exists():
-                raise FileNotFoundError(
-                    f"Required file not found: {path}"
-                )
+                raise FileNotFoundError(f"Required file not found: {path}")
 
         # --- metadata ------------------------------------------------
         with open(meta_path, "r", encoding="utf-8") as fh:
@@ -192,11 +190,7 @@ def main() -> None:
         print("  No results found.")
     else:
         for rank, r in enumerate(results, start=1):
-            print(
-                f"  {rank}. {r.filename}"
-                f"  (Class: {r.class_name})"
-                f"  -- Score: {r.score}"
-            )
+            print(f"  {rank}. {r.filename}" f"  (Class: {r.class_name})" f"  -- Score: {r.score}")
 
     print()
 

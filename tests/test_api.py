@@ -8,7 +8,6 @@ from fastapi.testclient import TestClient
 from eovs.api import app
 from eovs.search import SearchResult
 
-
 # -------------------------------------------------------------------
 # Fixtures
 # -------------------------------------------------------------------
