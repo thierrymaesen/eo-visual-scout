@@ -47,6 +47,7 @@ poetry run black src/ tests/ app/ # format
 ✅ **Sprint 2 / 10 — Completed** — CLIP image embeddings generation.
 ✅ **Sprint 3 / 10 — Completed** — Semantic search engine (SemanticSearcher + CLI).
 ✅ **Sprint 4 / 10 — Completed** — FastAPI server (REST API).
+✅ **Sprint 5 / 10 — Completed** — Gradio frontend (semantic image search UI).
 
 ## License
 
