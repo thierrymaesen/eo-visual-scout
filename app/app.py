@@ -3,19 +3,22 @@
 Provides a dark-themed web UI that queries the FastAPI backend
 (POST /search) and displays matching satellite images in a gallery.
 
-Sprint 5/10 — Gradio Interface.
+Sprint 9/10 — UI Image-to-Image (Frontend).
 """
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import time
+from io import BytesIO
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import gradio as gr
 import requests
+from PIL import Image
 
 # ---------------------------------------------------------------------------
 # Constants & configuration
@@ -30,6 +33,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 # ---------------------------------------------------------------------------
 # Core search function
 # ---------------------------------------------------------------------------
@@ -37,30 +41,63 @@ logger = logging.getLogger(__name__)
 
 def search_api(
     query: str,
+    image_pil: Optional[Image.Image],
     top_k: int,
 ) -> Tuple[List[Tuple[str, str]], str]:
-    """Call the FastAPI */search* endpoint and return gallery items."""
-    if not query or not query.strip():
-        return [], "Please enter a search query."
+    """Call the FastAPI */search* endpoint and return gallery items.
 
-    payload = {"query": query.strip(), "top_k": int(top_k)}
-    logger.info("Searching: %s (top_k=%d)", payload["query"], payload["top_k"])
+    Accepts either a text query **or** an uploaded PIL image.
+    The image is encoded to base64 before being sent to the API.
+    """
+    query = (query or "").strip()
+
+    if not query and image_pil is None:
+        return (
+            [],
+            "⚠️ Please enter text or upload an image.",
+        )
+
+    payload: dict = {"top_k": int(top_k)}
+
+    if image_pil is not None:
+        buffered = BytesIO()
+        image_pil.save(buffered, format="JPEG")
+        img_str = base64.b64encode(
+            buffered.getvalue()
+        ).decode("utf-8")
+        payload["image_base64"] = img_str
+        logger.info(
+            "Image search (top_k=%d, size=%d bytes)",
+            payload["top_k"],
+            len(img_str),
+        )
+    else:
+        payload["query"] = query
+        logger.info(
+            "Text search: %s (top_k=%d)",
+            query,
+            payload["top_k"],
+        )
 
     try:
         response = requests.post(
             f"{API_URL}/search",
             json=payload,
-            timeout=10,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         logger.error("API request failed: %s", exc)
         return (
             [],
-            "\u274c Error: API is unreachable. Is the backend running?",
+            "❌ Error: API is unreachable. "
+            "Is the backend running?",
         )
 
     if response.status_code != 200:
-        msg = f"\u274c HTTP {response.status_code}: {response.text[:200]}"
+        msg = (
+            f"❌ HTTP {response.status_code}: "
+            f"{response.text[:200]}"
+        )
         logger.warning(msg)
         return [], msg
 
@@ -74,14 +111,16 @@ def search_api(
             logger.warning("Image not found: %s", img_path)
             continue
         caption = (
-            f"[{item['class_name']}] Score: {item['score']:.3f}"
+            f"[{item['class_name']}] "
+            f"Score: {item['score']:.3f}"
         )
         gallery_items.append((str(img_path), caption))
 
     latency = data.get("latency_ms", 0)
+    mode = "image" if image_pil is not None else "text"
     status = (
-        f"\u2705 Found {len(gallery_items)} results "
-        f"in {latency:.1f}\u202fms."
+        f"✅ Found {len(gallery_items)} results "
+        f"in {latency:.1f}\u202fms ({mode} search)."
     )
     logger.info(status)
     return gallery_items, status
@@ -95,31 +134,46 @@ with gr.Blocks(
     theme=gr.themes.Monochrome(),
     title="EO Visual Scout",
 ) as demo:
-    # -- Header -------------------------------------------------------------
+    # -- Header ---------------------------------------------------------
     gr.Markdown(
         """
         <div style="text-align:center">
-        <h1>\U0001f6f0\ufe0f EO Visual Scout \u2014 Semantic Image Search</h1>
+        <h1>\U0001f6f0\ufe0f EO Visual Scout"""
+        + """ \u2014 Semantic Image Search</h1>
         <p style="font-size:1.1em;opacity:.85">
-        Describe an Earth Observation scene in natural language
-        (English or French) and let AI find the matching satellite
-        imagery instantly.
+        Search satellite imagery by text <b>or</b> by image.
+        Describe a scene in natural language or upload a photo
+        and let AI find the most similar EuroSAT tiles.
         </p>
         </div>
         """
     )
 
-    # -- Main layout --------------------------------------------------------
+    # -- Main layout ----------------------------------------------------
     with gr.Row():
-        # Controls (left) --------------------------------------------------
+        # Controls (left) ----------------------------------------------
         with gr.Column(scale=1):
-            query_box = gr.Textbox(
-                label="Search Query",
-                placeholder=(
-                    "e.g. 'a river crossing a dense forest'"
-                ),
-                lines=2,
-            )
+            with gr.Tabs():
+                with gr.TabItem(
+                    "\U0001f4dd Text Search"
+                ):
+                    query_box = gr.Textbox(
+                        label="Describe the scene",
+                        placeholder=(
+                            "e.g. 'a river crossing"
+                            " a dense forest'"
+                        ),
+                        lines=2,
+                    )
+                with gr.TabItem(
+                    "\U0001f5bc\ufe0f Image Search"
+                ):
+                    image_box = gr.Image(
+                        label="Upload a satellite image",
+                        type="pil",
+                        height=200,
+                    )
+
             slider = gr.Slider(
                 minimum=1,
                 maximum=24,
@@ -127,7 +181,7 @@ with gr.Blocks(
                 step=1,
                 label="Number of results",
             )
-            btn = gr.Button(
+            search_btn = gr.Button(
                 "\U0001f50d Search Images",
                 variant="primary",
             )
@@ -138,7 +192,7 @@ with gr.Blocks(
                 "'agricultural fields'"
             )
 
-        # Results (right) --------------------------------------------------
+        # Results (right) ----------------------------------------------
         with gr.Column(scale=2):
             status_text = gr.Markdown(
                 value="Ready.",
@@ -154,25 +208,40 @@ with gr.Blocks(
                 height="auto",
             )
 
-    # -- Footer -------------------------------------------------------------
+    # -- Footer ---------------------------------------------------------
     gr.Markdown(
-        "<div style='text-align:center;opacity:.6;margin-top:1.5em'>"
+        "<div style='text-align:center;opacity:.6;"
+        "margin-top:1.5em'>"
         "Powered by CLIP &amp; EuroSAT Dataset "
-        "| \U0001f680 Space EO Visual Scout Portfolio Project - By Thierry Maesen "
+        "| \U0001f680 Space EO Visual Scout "
+        "Portfolio Project - By Thierry Maesen "
         "</div>"
     )
 
-    # -- Events -------------------------------------------------------------
-    btn.click(
+    # -- Events ---------------------------------------------------------
+    search_btn.click(
         fn=search_api,
-        inputs=[query_box, slider],
+        inputs=[query_box, image_box, slider],
         outputs=[gallery, status_text],
     )
     query_box.submit(
         fn=search_api,
-        inputs=[query_box, slider],
+        inputs=[query_box, image_box, slider],
         outputs=[gallery, status_text],
     )
+
+    # Clear the other input when one is used
+    image_box.change(
+        fn=lambda _img: "",
+        inputs=[image_box],
+        outputs=[query_box],
+    )
+    query_box.change(
+        fn=lambda _txt: None,
+        inputs=[query_box],
+        outputs=[image_box],
+    )
+
 
 # ---------------------------------------------------------------------------
 # Entry-point
