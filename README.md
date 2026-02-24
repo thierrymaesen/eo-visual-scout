@@ -1,18 +1,50 @@
-# 🛰️ EO Visual Scout
+# 🛰️ EO Visual Scout — Semantic Satellite Image Search
 
+[![CI](https://github.com/thierrymaesen/eo-visual-scout/actions/workflows/ci.yml/badge.svg)](https://github.com/thierrymaesen/eo-visual-scout/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 
-Multilingual semantic search engine for Earth Observation imagery (EuroSAT) using CLIP.
+---
 
-## Overview
+## 🌍 What is EO Visual Scout?
 
-**EO Visual Scout** lets you search satellite images by natural-language queries in
-French and English. It encodes EuroSAT images with
-`sentence-transformers/clip-ViT-B-32-multilingual-v1` and retrieves the most
-relevant tiles via cosine similarity.
+An **AI-powered search engine** for Earth Observation imagery (EuroSAT).
+Type *"a river in a forest"* or **upload your own satellite photo**, and let
+the AI find visually similar areas instantly using OpenAI’s CLIP model.
 
-## Installation
+### Key Engineering Features
+
+- 🧠 **Multilingual Semantic Search** — Uses `clip-ViT-B-32-multilingual-v1`
+  to encode text and images into **512-dimension vectors** and perform
+  blazing-fast cosine similarity against **27,000 satellite images**.
+- 📸 **Killer Feature — Image-to-Image** — Upload any satellite image to
+  find similar patterns globally, no text required.
+- 🛡️ **Production-Ready Architecture** — Clean Python, 100% mocked
+  Pytest coverage, and a GitHub Actions CI pipeline cached to run in
+  under 3 minutes.
+- ⚡ **Full-Stack** — FastAPI REST backend + modern Gradio UI.
+
+### Architecture
+
+```text
+eo-visual-scout/
+├── app/app.py              # Gradio frontend (dark-themed UI)
+├── src/eovs/
+│   ├── ingest.py          # EuroSAT dataset downloader
+│   ├── build_embeddings.py # CLIP vector builder (512-d)
+│   ├── search.py          # Semantic search engine
+│   └── api.py             # FastAPI REST backend
+├── tests/                   # Pytest unit tests (mocked)
+├── .github/workflows/ci.yml # CI pipeline (< 3 min)
+├── Dockerfile               # HF Spaces deployment
+└── pyproject.toml           # Poetry config
+```
+
+---
+
+## 🚀 Installation & Usage
+
+### 1. Clone & install
 
 ```bash
 git clone https://github.com/thierrymaesen/eo-visual-scout.git
@@ -20,39 +52,100 @@ cd eo-visual-scout
 poetry install
 ```
 
-## Usage
+### 2. Download data & build embeddings
 
 ```bash
-# Ingest EuroSAT dataset (Sprint 1)
-python -m eovs.ingest --verbose
-python -m eovs.ingest --limit 100 --verbose  # quick test with 100 images
-
-# Build CLIP image embeddings (Sprint 2)
-python -m eovs.build_embeddings --verbose
-python -m eovs.build_embeddings --force -v  # re-generate embeddings
-
-# Semantic search (Sprint 3)
-python -m eovs.search --query "a river in a forest" --top-k 5
-python -m eovs.search --query "zone industrielle" --top-k 3 --verbose
-
-# Dev commands
-poetry run pytest tests/ -v          # run tests
-poetry run ruff check src/ tests/    # lint
-poetry run black src/ tests/ app/    # format
+poetry run python -m eovs.ingest --verbose
+poetry run python -m eovs.build_embeddings --verbose
 ```
 
-## Status
+### 3. Launch the application
 
-✅ **Sprint 1 / 10 — Completed** — EuroSAT datashet ingestion pipeline.
-✅ **Sprint 2 / 10 — Completed** — CLIP image embeddings generation.
-✅ **Sprint 3 / 10 — Completed** — Semantic search engine (SemanticSearcher + CLI).
-✅ **Sprint 4 / 10 — Completed** — FastAPI server (REST API).
-✅ **Sprint 5 / 10 — Completed** — Gradio frontend (semantic image search UI).
-✅ **Sprint 6 / 10 — Completed** — Unit tests & evaluation (Pytest).
-✅ **Sprint 7 / 10 — Completed** — Continuous Integration (GitHub Actions CI pipeline).
-✅ **Sprint 8 / 10 — Completed** — Killer Feature (Image-to-Image Search).
-✅ **Sprint 9 / 10 — Completed** — UI Image-to-Image (Frontend).
+Open **two terminals**:
 
-## License
+```bash
+# Terminal 1 — FastAPI backend
+poetry run uvicorn eovs.api:app --host 0.0.0.0 --port 8000
+```
+
+```bash
+# Terminal 2 — Gradio frontend
+poetry run python app/app.py
+```
+
+Then open **http://localhost:7860** in your browser.
+
+### 4. Dev commands
+
+```bash
+poetry run pytest tests/ -v      # run tests
+poetry run ruff check src/ tests/ # lint
+poetry run black src/ tests/ app/ # format
+```
+
+---
+
+## 🇫🇷 Version française
+
+### 🌍 Qu’est-ce que EO Visual Scout ?
+
+**Moteur de recherche par intelligence artificielle** pour l’observation de
+la Terre (EuroSAT). Tapez *« un fleuve dans une forêt »* ou **uploadez une
+photo satellite**, et l’IA retrouve instantanément les zones similaires
+grâce au modèle CLIP d’OpenAI.
+
+### Points clés
+
+- 🧠 **Recherche sémantique multilingue** — Encode textes et images en
+  vecteurs de **512 dimensions** et effectue une similarité cosinus
+  ultra-rapide sur **27 000 images satellite**.
+- 📸 **Killer Feature — Image-to-Image** — Uploadez n’importe quelle image
+  satellite pour trouver des motifs similaires, aucun texte requis.
+- 🛡️ **Architecture d’ingénieur senior** — Code Python propre, couverture
+  Pytest 100% mockée, pipeline CI GitHub Actions en moins de 3 minutes.
+- ⚡ **Full-Stack** — Backend REST FastAPI + interface Gradio moderne.
+
+### Installation rapide
+
+```bash
+git clone https://github.com/thierrymaesen/eo-visual-scout.git
+cd eo-visual-scout
+poetry install
+poetry run python -m eovs.ingest --verbose
+poetry run python -m eovs.build_embeddings --verbose
+```
+
+Lancez ensuite **deux terminaux** :
+
+```bash
+# Terminal 1 — Backend FastAPI
+poetry run uvicorn eovs.api:app --host 0.0.0.0 --port 8000
+```
+
+```bash
+# Terminal 2 — Frontend Gradio
+poetry run python app/app.py
+```
+
+Ouvrez **http://localhost:7860** dans votre navigateur.
+
+---
+
+## 📋 Sprint Progress
+
+✅ **Sprint 1 / 10** — EuroSAT dataset ingestion pipeline.
+✅ **Sprint 2 / 10** — CLIP image embeddings generation.
+✅ **Sprint 3 / 10** — Semantic search engine (SemanticSearcher + CLI).
+✅ **Sprint 4 / 10** — FastAPI server (REST API).
+✅ **Sprint 5 / 10** — Gradio frontend (semantic image search UI).
+✅ **Sprint 6 / 10** — Unit tests & evaluation (Pytest).
+✅ **Sprint 7 / 10** — Continuous Integration (GitHub Actions CI pipeline).
+✅ **Sprint 8 / 10** — Killer Feature (Image-to-Image Search).
+✅ **Sprint 9 / 10** — UI Image-to-Image (Frontend).
+✅ **Sprint 10 / 10** — Documentation Bilingue & Préparation Déploiement Cloud.
+
+---
+
+## 📜 License
 
 [MIT](LICENSE) © 2026 Thierry Maesen
