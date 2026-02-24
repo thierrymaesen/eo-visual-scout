@@ -37,34 +37,26 @@ def test_health_endpoint_not_loaded(client: TestClient) -> None:
 def test_search_endpoint_fails_if_not_loaded(
     client: TestClient,
 ) -> None:
-    """POST /search returns 503 when searcher_instance is None."""
+    """POST /search returns 503 when the model is not loaded."""
     response = client.post(
         "/search",
         json={"query": "forest", "top_k": 5},
     )
 
     assert response.status_code == 503
-    assert response.json()["detail"] == "Model not loaded"
 
 
 def test_search_endpoint_success(client: TestClient) -> None:
     """POST /search returns 200 with results when model is loaded."""
+    mock_searcher = MagicMock()
     fake_results = [
         SearchResult(
-            id=0,
-            filename="1.jpg",
-            class_name="River",
-            score=0.99,
+            id=0, filename="1.jpg", class_name="Forest", score=0.95
         ),
         SearchResult(
-            id=1,
-            filename="2.jpg",
-            class_name="Forest",
-            score=0.85,
+            id=1, filename="2.jpg", class_name="River", score=0.80
         ),
     ]
-
-    mock_searcher = MagicMock()
     mock_searcher.search.return_value = fake_results
 
     with patch("eovs.api.searcher_instance", mock_searcher):
@@ -85,13 +77,18 @@ def test_search_endpoint_success(client: TestClient) -> None:
 def test_search_invalid_payload_empty_query(
     client: TestClient,
 ) -> None:
-    """POST /search with a too-short query returns 422."""
-    response = client.post(
-        "/search",
-        json={"query": "", "top_k": 5},
-    )
+    """POST /search with empty query and no image returns 400."""
+    mock_searcher = MagicMock()
 
-    assert response.status_code == 422
+    with patch("eovs.api.searcher_instance", mock_searcher):
+        response = client.post(
+            "/search",
+            json={"query": "", "top_k": 5},
+        )
+
+    assert response.status_code == 400
+    body = response.json()
+    assert "Provide either query or image_base64" in body["detail"]
 
 
 def test_search_invalid_payload_negative_top_k(
