@@ -84,10 +84,9 @@ def test_semantic_searcher_empty_query(
     mock_st_cls: MagicMock,
     mock_data_dir: Path,
 ) -> None:
-    """search() returns an empty list when the query is empty."""
+    """search() raises ValueError when no query or image is provided."""
     mock_st_cls.return_value = MagicMock()
 
     searcher = SemanticSearcher(data_dir=mock_data_dir)
-    results = searcher.search("", top_k=5)
-
-    assert results == []
+    with pytest.raises(ValueError, match="Must provide either"):
+        searcher.search("", top_k=5)
