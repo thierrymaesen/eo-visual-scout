@@ -3,6 +3,8 @@
 import json
 import logging
 import argparse
+import os
+import tempfile
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
@@ -109,11 +111,16 @@ class SemanticSearcher:
         """
         # --- encode --------------------------------------------------
         if image is not None:
+                        tmp_path = os.path.join(
+                tempfile.gettempdir(), "_eovs_query.jpg"
+            )
+            image.save(tmp_path)
             query_emb = self.model.encode(
-                [image],
+                [tmp_path],
                 convert_to_numpy=True,
                 show_progress_bar=False,
             )[0]
+            os.unlink(tmp_path)
         elif query and query.strip():
             query_emb = self.model.encode(
                 query,
