@@ -13,13 +13,16 @@ import numpy as np
 from PIL import Image
 from sentence_transformers import SentenceTransformer, util
 
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
+
 MODEL_NAME = "sentence-transformers/clip-ViT-B-32-multilingual-v1"
 DEFAULT_DATA_DIR = Path("data/eurosat")
 
 logger = logging.getLogger(__name__)
+
 
 # ---------------------------------------------------------------------------
 # Data structures
@@ -57,8 +60,8 @@ def setup_logging(verbose: bool) -> None:
 
 
 class SemanticSearcher:
-    """Load CLIP embeddings once, then answer text or image queries
-    via cosine similarity."""
+    """Load CLIP embeddings once, then answer text or image
+    queries via cosine similarity."""
 
     def __init__(
         self,
@@ -66,7 +69,6 @@ class SemanticSearcher:
         model_name: str = MODEL_NAME,
     ) -> None:
         self.data_dir = Path(data_dir)
-
         meta_path: Path = self.data_dir / "metadata.json"
         npz_path: Path = self.data_dir / "embeddings.npz"
 
@@ -87,7 +89,6 @@ class SemanticSearcher:
 
         # --- CLIP model ----------------------------------------------
         self.model = SentenceTransformer(model_name)
-
         logger.info(
             "Searcher initialized with %d images",
             len(self.metadata),
@@ -103,16 +104,18 @@ class SemanticSearcher:
         image: Optional[Image.Image] = None,
         top_k: int = 5,
     ) -> List[SearchResult]:
-        """Return the *top_k* images most similar to *query* or *image*.
+        """Return the *top_k* images most similar to *query*
+        or *image*.
 
-        Provide either a text query or a PIL image.  If both are
-        given the image takes precedence.  Raises ValueError when
-        neither is supplied.
+        Provide either a text query or a PIL image.
+        If both are given the image takes precedence.
+        Raises ValueError when neither is supplied.
         """
         # --- encode --------------------------------------------------
         if image is not None:
-                        tmp_path = os.path.join(
-                tempfile.gettempdir(), "_eovs_query.jpg"
+            tmp_path = os.path.join(
+                tempfile.gettempdir(),
+                "_eovs_query.jpg",
             )
             image.save(tmp_path)
             query_emb = self.model.encode(
@@ -139,7 +142,9 @@ class SemanticSearcher:
 
         # Convert to numpy if needed (tensor -> cpu -> numpy)
         if hasattr(cos_scores, "cpu"):
-            cos_scores_np: np.ndarray = cos_scores.cpu().numpy()
+            cos_scores_np: np.ndarray = (
+                cos_scores.cpu().numpy()
+            )
         else:
             cos_scores_np = np.asarray(cos_scores)
 
@@ -160,12 +165,11 @@ class SemanticSearcher:
                     ),
                 )
             )
-
         return results
 
 
 # ---------------------------------------------------------------------------
-# CLI entry-point  (text-only for simplicity)
+# CLI entry-point (text-only for simplicity)
 # ---------------------------------------------------------------------------
 
 
@@ -190,24 +194,26 @@ def main() -> None:
         "--data-dir",
         type=Path,
         default=DEFAULT_DATA_DIR,
-        help="Path to the data directory (default: data/eurosat).",
+        help=(
+            "Path to the data directory "
+            "(default: data/eurosat)."
+        ),
     )
     parser.add_argument(
         "--verbose",
         action="store_true",
         help="Enable debug logging.",
     )
-
     args = parser.parse_args()
-
     setup_logging(args.verbose)
 
     searcher = SemanticSearcher(
         data_dir=args.data_dir,
         model_name=MODEL_NAME,
     )
-
-    results = searcher.search(query=args.query, top_k=args.top_k)
+    results = searcher.search(
+        query=args.query, top_k=args.top_k
+    )
 
     print(f"\n{'='*60}")
     print(f"  Query : {args.query}")
@@ -223,7 +229,6 @@ def main() -> None:
                 f"  (Class: {r.class_name})"
                 f"  -- Score: {r.score}"
             )
-
     print()
 
 
