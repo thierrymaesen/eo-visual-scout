@@ -4,10 +4,11 @@ import json
 import logging
 import argparse
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
 import numpy as np
+from PIL import Image
 from sentence_transformers import SentenceTransformer, util
 
 # ---------------------------------------------------------------------------
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class SearchResult:
-    """Single search result returned by SemanticSearcher."""
+        """Single search result returned by SemanticSearcher."""
 
     id: int
     filename: str
@@ -39,13 +40,13 @@ class SearchResult:
 
 
 def setup_logging(verbose: bool) -> None:
-    """Configure root logger level and format."""
-    level = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+        """Configure root logger level and format."""
+        level = logging.DEBUG if verbose else logging.INFO
+        logging.basicConfig(
+            level=level,
+            format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -54,27 +55,29 @@ def setup_logging(verbose: bool) -> None:
 
 
 class SemanticSearcher:
-    """Load CLIP embeddings once, then answer text queries via cosine
-    similarity."""
+        """Load CLIP embeddings once, then answer text or image queries
+            via cosine similarity."""
 
     def __init__(
-        self,
-        data_dir: Path = DEFAULT_DATA_DIR,
-        model_name: str = MODEL_NAME,
+                self,
+                data_dir: Path = DEFAULT_DATA_DIR,
+                model_name: str = MODEL_NAME,
     ) -> None:
-        self.data_dir = Path(data_dir)
+                self.data_dir = Path(data_dir)
 
         meta_path: Path = self.data_dir / "metadata.json"
         npz_path: Path = self.data_dir / "embeddings.npz"
 
         # --- guard: required files -----------------------------------
         for path in (meta_path, npz_path):
-            if not path.exists():
-                raise FileNotFoundError(f"Required file not found: {path}")
+                        if not path.exists():
+                                            raise FileNotFoundError(
+                                                                    f"Required file not found: {path}"
+                                            )
 
-        # --- metadata ------------------------------------------------
-        with open(meta_path, "r", encoding="utf-8") as fh:
-            self.metadata: List[Dict[str, Any]] = json.load(fh)
+                    # --- metadata ------------------------------------------------
+                    with open(meta_path, "r", encoding="utf-8") as fh:
+                                    self.metadata: List[Dict[str, Any]] = json.load(fh)
 
         # --- embeddings ----------------------------------------------
         data = np.load(str(npz_path))
@@ -84,102 +87,124 @@ class SemanticSearcher:
         self.model = SentenceTransformer(model_name)
 
         logger.info(
-            "Searcher initialized with %d images",
-            len(self.metadata),
+                        "Searcher initialized with %d images",
+                        len(self.metadata),
         )
 
     # ------------------------------------------------------------------ #
-    #  Search
+    # Search
     # ------------------------------------------------------------------ #
 
     def search(
-        self,
-        query: str,
-        top_k: int = 5,
+                self,
+                query: str = "",
+                image: Optional[Image.Image] = None,
+                top_k: int = 5,
     ) -> List[SearchResult]:
-        """Return the *top_k* images most similar to *query*."""
-        if not query or not query.strip():
-            return []
+                """Return the *top_k* images most similar to *query* or *image*.
 
-        # Encode query text
-        query_emb = self.model.encode(
-            query,
-            convert_to_numpy=True,
-            show_progress_bar=False,
-        )
+                        Provide either a text ``query`` or a PIL ``image``.  If both are
+                                given the image takes precedence.  Raises ``ValueError`` when
+                                        neither is supplied.
+                                                """
+                # --- encode --------------------------------------------------
+                if image is not None:
+                                query_emb = self.model.encode(
+                                                    image,
+                                                    convert_to_numpy=True,
+                                                    show_progress_bar=False,
+                                )
+elif query and query.strip():
+            query_emb = self.model.encode(
+                                query,
+                                convert_to_numpy=True,
+                                show_progress_bar=False,
+            )
+else:
+            raise ValueError(
+                                "Must provide either a text query or an image."
+            )
 
-        # Cosine similarity (sentence-transformers returns a tensor)
-        cos_scores = util.cos_sim(query_emb, self.image_embeddings)[0]
+        # --- cosine similarity (sentence-transformers tensor) --------
+            cos_scores = util.cos_sim(
+                query_emb, self.image_embeddings
+            )[0]
 
         # Convert to numpy if needed (tensor -> cpu -> numpy)
-        if hasattr(cos_scores, "cpu"):
-            cos_scores_np: np.ndarray = cos_scores.cpu().numpy()
-        else:
-            cos_scores_np = np.asarray(cos_scores)
+            if hasattr(cos_scores, "cpu"):
+                            cos_scores_np: np.ndarray = (
+                                                cos_scores.cpu().numpy()
+                            )
+else:
+                cos_scores_np = np.asarray(cos_scores)
 
         # Top-K indices (descending order)
-        top_indices = np.argsort(cos_scores_np)[::-1][:top_k]
+            top_indices = np.argsort(cos_scores_np)[::-1][:top_k]
 
         results: List[SearchResult] = []
         for idx in top_indices:
-            idx_int = int(idx)
-            meta = self.metadata[idx_int]
-            results.append(
-                SearchResult(
-                    id=idx_int,
-                    filename=meta["filename"],
-                    class_name=meta["class_name"],
-                    score=round(float(cos_scores_np[idx_int]), 4),
-                )
-            )
+                        idx_int = int(idx)
+                        meta = self.metadata[idx_int]
+                        results.append(
+                            SearchResult(
+                                id=idx_int,
+                                filename=meta["filename"],
+                                class_name=meta["class_name"],
+                                score=round(
+                                    float(cos_scores_np[idx_int]), 4
+                                ),
+                            )
+                        )
 
         return results
 
 
 # ---------------------------------------------------------------------------
-# CLI entry-point
+# CLI entry-point  (text-only for simplicity)
 # ---------------------------------------------------------------------------
 
 
 def main() -> None:
-    """Quick command-line test for SemanticSearcher."""
-    parser = argparse.ArgumentParser(
-        description="Semantic search over EO satellite images",
-    )
-    parser.add_argument(
-        "--query",
-        type=str,
-        required=True,
-        help="Text query (any language supported by CLIP).",
-    )
-    parser.add_argument(
-        "--top-k",
-        type=int,
-        default=5,
-        help="Number of results to return (default: 5).",
-    )
-    parser.add_argument(
-        "--data-dir",
-        type=Path,
-        default=DEFAULT_DATA_DIR,
-        help="Path to the data directory (default: data/eurosat).",
-    )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable debug logging.",
-    )
+        """Quick command-line test for SemanticSearcher."""
+        parser = argparse.ArgumentParser(
+            description="Semantic search over EO satellite images",
+        )
+        parser.add_argument(
+            "--query",
+            type=str,
+            required=True,
+            help="Text query (any language supported by CLIP).",
+        )
+        parser.add_argument(
+            "--top-k",
+            type=int,
+            default=5,
+            help="Number of results to return (default: 5).",
+        )
+        parser.add_argument(
+            "--data-dir",
+            type=Path,
+            default=DEFAULT_DATA_DIR,
+            help="Path to the data directory (default: data/eurosat).",
+        )
+        parser.add_argument(
+            "--verbose",
+            action="store_true",
+            help="Enable debug logging.",
+        )
 
     args = parser.parse_args()
 
     setup_logging(args.verbose)
 
     searcher = SemanticSearcher(
-        data_dir=args.data_dir,
-        model_name=MODEL_NAME,
+                data_dir=args.data_dir,
+                model_name=MODEL_NAME,
     )
 
-    results = searcher.search(args.query, top_k=args.top_k)
+    results = searcher.search(
+                query=args.query, top_k=args.top_k
+    )
 
     print(f"\n{'='*60}")
     print(f"  Query : {args.query}")
@@ -187,13 +212,17 @@ def main() -> None:
     print(f"{'='*60}\n")
 
     if not results:
-        print("  No results found.")
-    else:
-        for rank, r in enumerate(results, start=1):
-            print(f"  {rank}. {r.filename}" f"  (Class: {r.class_name})" f"  -- Score: {r.score}")
+                print("  No results found.")
+else:
+            for rank, r in enumerate(results, start=1):
+                            print(
+                                                f"  {rank}. {r.filename}"
+                                                f"  (Class: {r.class_name})"
+                                                f"  -- Score: {r.score}"
+                            )
 
-    print()
+        print()
 
 
 if __name__ == "__main__":
-    main()
+        main()
