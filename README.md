@@ -51,6 +51,7 @@ poetry run black src/ tests/ app/    # format
 ✅ **Sprint 6 / 10 — Completed** — Unit tests & evaluation (Pytest).
 ✅ **Sprint 7 / 10 — Completed** — Continuous Integration (GitHub Actions CI pipeline).
 ✅ **Sprint 8 / 10 — Completed** — Killer Feature (Image-to-Image Search).
+✅ **Sprint 9 / 10 — Completed** — UI Image-to-Image (Frontend).
 
 ## License
 
