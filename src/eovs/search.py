@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
-import numpy as nph
+import numpy as np
 from PIL import Image
 from sentence_transformers import SentenceTransformer, util
 
