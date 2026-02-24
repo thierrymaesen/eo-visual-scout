@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
-import numpy as np
+import numpy as nph
 from PIL import Image
 from sentence_transformers import SentenceTransformer, util
 
@@ -110,10 +110,10 @@ class SemanticSearcher:
         # --- encode --------------------------------------------------
         if image is not None:
             query_emb = self.model.encode(
-                image,
+                [image],
                 convert_to_numpy=True,
                 show_progress_bar=False,
-            )
+            )[0]
         elif query and query.strip():
             query_emb = self.model.encode(
                 query,
