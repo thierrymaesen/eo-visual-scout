@@ -25,20 +25,20 @@ poetry install
 ```bash
 # Ingest EuroSAT dataset (Sprint 1)
 python -m eovs.ingest --verbose
-python -m eovs.ingest --limit 100 --verbose # quick test with 100 images
+python -m eovs.ingest --limit 100 --verbose  # quick test with 100 images
 
 # Build CLIP image embeddings (Sprint 2)
 python -m eovs.build_embeddings --verbose
-python -m eovs.build_embeddings --force -v # re-generate embeddings
+python -m eovs.build_embeddings --force -v  # re-generate embeddings
 
 # Semantic search (Sprint 3)
 python -m eovs.search --query "a river in a forest" --top-k 5
 python -m eovs.search --query "zone industrielle" --top-k 3 --verbose
 
 # Dev commands
-poetry run pytest tests/ -v # run tests
-poetry run ruff check src/ tests/ # lint
-poetry run black src/ tests/ app/ # format
+poetry run pytest tests/ -v          # run tests
+poetry run ruff check src/ tests/    # lint
+poetry run black src/ tests/ app/    # format
 ```
 
 ## Status
@@ -50,6 +50,7 @@ poetry run black src/ tests/ app/ # format
 ✅ **Sprint 5 / 10 — Completed** — Gradio frontend (semantic image search UI).
 ✅ **Sprint 6 / 10 — Completed** — Unit tests & evaluation (Pytest).
 ✅ **Sprint 7 / 10 — Completed** — Continuous Integration (GitHub Actions CI pipeline).
+✅ **Sprint 8 / 10 — Completed** — Killer Feature (Image-to-Image Search).
 
 ## License
 
