@@ -14,34 +14,39 @@
 
 An **AI-powered search engine** for Earth Observation imagery (EuroSAT).
 Type *"a river in a forest"* or **upload your own satellite photo**, and let
-the AI find visually similar areas instantly using OpenAI’s CLIP model.
+the AI find visually similar areas instantly using OpenAI's CLIP model.
+
+### 📸 Screenshots
+
+**Text Search** — Type a natural language description (e.g. *"a river crossing a dense forest"*) and the engine returns the most visually similar EuroSAT satellite tiles, ranked by cosine similarity score.
+
+![Text Search — Results for "a river crossing a dense forest"](https://github.com/user-attachments/assets/332bc859-6674-4047-88f0-0867b41e14f3)
+
+**Image Search** — Upload any satellite image and let the CLIP model find visually similar tiles across the entire EuroSAT dataset. No text input needed.
+
+![Image Search — Upload a satellite image to find similar patterns](https://github.com/user-attachments/assets/62b69052-6fc7-4f59-9231-7b247a2003ae)
 
 ### Key Engineering Features
 
-- 🧠 **Multilingual Semantic Search** — Uses `clip-ViT-B-32-multilingual-v1`
-  to encode text and images into **512-dimension vectors** and perform
-  blazing-fast cosine similarity against **27,000 satellite images**.
-- 📸 **Killer Feature — Image-to-Image** — Upload any satellite image to
-  find similar patterns globally, no text required.
-- 🛡️ **Production-Ready Architecture** — Clean Python, 100% mocked
-  Pytest coverage, and a GitHub Actions CI pipeline cached to run in
-  under 3 minutes.
+- 🧠 **Multilingual Semantic Search** — Uses `clip-ViT-B-32-multilingual-v1` to encode text and images into **512-dimension vectors** and perform blazing-fast cosine similarity against **27,000 satellite images**.
+- 📸 **Killer Feature — Image-to-Image** — Upload any satellite image to find similar patterns globally, no text required.
+- 🛡️ **Production-Ready Architecture** — Clean Python, 100% mocked Pytest coverage, and a GitHub Actions CI pipeline cached to run in under 3 minutes.
 - ⚡ **Full-Stack** — FastAPI REST backend + modern Gradio UI.
 
 ### Architecture
 
 ```text
 eo-visual-scout/
-├── app/app.py              # Gradio frontend (dark-themed UI)
+├── app/app.py                  # Gradio frontend (dark-themed UI)
 ├── src/eovs/
-│   ├── ingest.py          # EuroSAT dataset downloader
-│   ├── build_embeddings.py # CLIP vector builder (512-d)
-│   ├── search.py          # Semantic search engine
-│   └── api.py             # FastAPI REST backend
-├── tests/                   # Pytest unit tests (mocked)
-├── .github/workflows/ci.yml # CI pipeline (< 3 min)
-├── Dockerfile               # HF Spaces deployment
-└── pyproject.toml           # Poetry config
+│   ├── ingest.py               # EuroSAT dataset downloader
+│   ├── build_embeddings.py     # CLIP vector builder (512-d)
+│   ├── search.py               # Semantic search engine
+│   └── api.py                  # FastAPI REST backend
+├── tests/                      # Pytest unit tests (mocked)
+├── .github/workflows/ci.yml    # CI pipeline (< 3 min)
+├── Dockerfile                  # HF Spaces deployment
+└── pyproject.toml              # Poetry config
 ```
 
 ---
@@ -82,15 +87,12 @@ Then open **http://localhost:7860** in your browser.
 ### 4. Dev commands
 
 ```bash
-poetry run pytest tests/ -v      # run tests
-poetry run ruff check src/ tests/ # lint
-poetry run black src/ tests/ app/ # format
+poetry run pytest tests/ -v          # run tests
+poetry run ruff check src/ tests/    # lint
+poetry run black src/ tests/ app/    # format
 ```
 
 ---
-
-## 🇫🇷 Version française
-
 
 ### ☁️ Cloud Deployment
 
@@ -100,25 +102,34 @@ This application is deployed on **Hugging Face Spaces** using Docker.
 
 The Space runs a Docker container with:
 - **FastAPI** backend (port 8000) serving the semantic search API
-- - **Gradio** frontend (port 7860) providing the web interface
-  - - **CLIP multilingual model** loaded at startup for text and image encoding
-    - - **27,000 EuroSAT satellite images** indexed for instant search
-### 🌍 Qu’est-ce que EO Visual Scout ?
+- **Gradio** frontend (port 7860) providing the web interface
+- **CLIP multilingual model** loaded at startup for text and image encoding
+- **27,000 EuroSAT satellite images** indexed for instant search
 
-**Moteur de recherche par intelligence artificielle** pour l’observation de
-la Terre (EuroSAT). Tapez *« un fleuve dans une forêt »* ou **uploadez une
-photo satellite**, et l’IA retrouve instantanément les zones similaires
-grâce au modèle CLIP d’OpenAI.
+---
+
+## 🇫🇷 Version française
+
+### 🌍 Qu'est-ce que EO Visual Scout ?
+
+**Moteur de recherche par intelligence artificielle** pour l'observation de la Terre (EuroSAT).
+Tapez *« un fleuve dans une forêt »* ou **uploadez une photo satellite**, et l'IA retrouve instantanément les zones similaires grâce au modèle CLIP d'OpenAI.
+
+### 📸 Captures d'écran
+
+**Recherche textuelle** — Saisissez une description en langage naturel (ex. *« a river crossing a dense forest »*) et le moteur retourne les tuiles satellite EuroSAT les plus similaires visuellement, classées par score de similarité cosinus.
+
+![Recherche textuelle — Résultats pour "a river crossing a dense forest"](https://github.com/user-attachments/assets/332bc859-6674-4047-88f0-0867b41e14f3)
+
+**Recherche par image** — Uploadez n'importe quelle image satellite et laissez le modèle CLIP trouver les tuiles visuellement similaires dans tout le dataset EuroSAT. Aucun texte requis.
+
+![Recherche par image — Uploadez une image satellite pour trouver des motifs similaires](https://github.com/user-attachments/assets/62b69052-6fc7-4f59-9231-7b247a2003ae)
 
 ### Points clés
 
-- 🧠 **Recherche sémantique multilingue** — Encode textes et images en
-  vecteurs de **512 dimensions** et effectue une similarité cosinus
-  ultra-rapide sur **27 000 images satellite**.
-- 📸 **Killer Feature — Image-to-Image** — Uploadez n’importe quelle image
-  satellite pour trouver des motifs similaires, aucun texte requis.
-- 🛡️ **Architecture d’ingénieur senior** — Code Python propre, couverture
-  Pytest 100% mockée, pipeline CI GitHub Actions en moins de 3 minutes.
+- 🧠 **Recherche sémantique multilingue** — Encode textes et images en vecteurs de **512 dimensions** et effectue une similarité cosinus ultra-rapide sur **27 000 images satellite**.
+- 📸 **Killer Feature — Image-to-Image** — Uploadez n'importe quelle image satellite pour trouver des motifs similaires, aucun texte requis.
+- 🛡️ **Architecture d'ingénieur senior** — Code Python propre, couverture Pytest 100% mockée, pipeline CI GitHub Actions en moins de 3 minutes.
 - ⚡ **Full-Stack** — Backend REST FastAPI + interface Gradio moderne.
 
 ### Installation rapide
@@ -145,7 +156,6 @@ poetry run python app/app.py
 
 Ouvrez **http://localhost:7860** dans votre navigateur.
 
-
 ### ☁️ Déploiement Cloud
 
 Cette application est déployée sur **Hugging Face Spaces** via Docker.
@@ -154,9 +164,10 @@ Cette application est déployée sur **Hugging Face Spaces** via Docker.
 
 Le Space exécute un conteneur Docker avec :
 - **FastAPI** backend (port 8000) pour l'API de recherche sémantique
-- - **Gradio** frontend (port 7860) pour l'interface web
-  - - **Modèle CLIP multilingue** chargé au démarrage pour l'encodage texte et image
-    - - **27 000 images satellite EuroSAT** indexées pour une recherche instantanée
+- **Gradio** frontend (port 7860) pour l'interface web
+- **Modèle CLIP multilingue** chargé au démarrage pour l'encodage texte et image
+- **27 000 images satellite EuroSAT** indexées pour une recherche instantanée
+
 ---
 
 ## 📋 Sprint Progress
