@@ -3,6 +3,10 @@
 [![CI](https://github.com/thierrymaesen/eo-visual-scout/actions/workflows/ci.yml/badge.svg)](https://github.com/thierrymaesen/eo-visual-scout/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/thierrymaesen/eo-visual-scout)
+[![Docker](https://img.shields.io/badge/Docker-Deployed-2496ED?logo=docker&logoColor=white)](https://huggingface.co/spaces/thierrymaesen/eo-visual-scout)
+
+> **[Live Demo / Démo en ligne](https://huggingface.co/spaces/thierrymaesen/eo-visual-scout)** — Try it now on Hugging Face Spaces! / Essayez-le maintenant sur Hugging Face Spaces !
 
 ---
 
@@ -87,6 +91,18 @@ poetry run black src/ tests/ app/ # format
 
 ## 🇫🇷 Version française
 
+
+### ☁️ Cloud Deployment
+
+This application is deployed on **Hugging Face Spaces** using Docker.
+
+👉 **[Try the live app here](https://huggingface.co/spaces/thierrymaesen/eo-visual-scout)**
+
+The Space runs a Docker container with:
+- **FastAPI** backend (port 8000) serving the semantic search API
+- - **Gradio** frontend (port 7860) providing the web interface
+  - - **CLIP multilingual model** loaded at startup for text and image encoding
+    - - **27,000 EuroSAT satellite images** indexed for instant search
 ### 🌍 Qu’est-ce que EO Visual Scout ?
 
 **Moteur de recherche par intelligence artificielle** pour l’observation de
@@ -129,6 +145,18 @@ poetry run python app/app.py
 
 Ouvrez **http://localhost:7860** dans votre navigateur.
 
+
+### ☁️ Déploiement Cloud
+
+Cette application est déployée sur **Hugging Face Spaces** via Docker.
+
+👉 **[Essayez l'application en ligne ici](https://huggingface.co/spaces/thierrymaesen/eo-visual-scout)**
+
+Le Space exécute un conteneur Docker avec :
+- **FastAPI** backend (port 8000) pour l'API de recherche sémantique
+- - **Gradio** frontend (port 7860) pour l'interface web
+  - - **Modèle CLIP multilingue** chargé au démarrage pour l'encodage texte et image
+    - - **27 000 images satellite EuroSAT** indexées pour une recherche instantanée
 ---
 
 ## 📋 Sprint Progress
