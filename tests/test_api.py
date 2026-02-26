@@ -50,12 +50,8 @@ def test_search_endpoint_success(client: TestClient) -> None:
     """POST /search returns 200 with results when model is loaded."""
     mock_searcher = MagicMock()
     fake_results = [
-        SearchResult(
-            id=0, filename="1.jpg", class_name="Forest", score=0.95
-        ),
-        SearchResult(
-            id=1, filename="2.jpg", class_name="River", score=0.80
-        ),
+        SearchResult(id=0, filename="1.jpg", class_name="Forest", score=0.95),
+        SearchResult(id=1, filename="2.jpg", class_name="River", score=0.80),
     ]
     mock_searcher.search.return_value = fake_results
 

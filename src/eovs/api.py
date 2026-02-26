@@ -181,9 +181,7 @@ async def search(request: SearchRequest):
         for r in raw_results
     ]
 
-    response_query = (
-        "[Image Search]" if pil_image is not None else text_query
-    )
+    response_query = "[Image Search]" if pil_image is not None else text_query
 
     return SearchResponse(
         query=response_query,

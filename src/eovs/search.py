@@ -13,7 +13,6 @@ import numpy as np
 from PIL import Image
 from sentence_transformers import SentenceTransformer, util
 
-
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -75,9 +74,7 @@ class SemanticSearcher:
         # --- guard: required files -----------------------------------
         for path in (meta_path, npz_path):
             if not path.exists():
-                raise FileNotFoundError(
-                    f"Required file not found: {path}"
-                )
+                raise FileNotFoundError(f"Required file not found: {path}")
 
         # --- metadata ------------------------------------------------
         with open(meta_path, "r", encoding="utf-8") as fh:
@@ -131,20 +128,14 @@ class SemanticSearcher:
                 show_progress_bar=False,
             )
         else:
-            raise ValueError(
-                "Must provide either a text query or an image."
-            )
+            raise ValueError("Must provide either a text query or an image.")
 
         # --- cosine similarity ---------------------------------------
-        cos_scores = util.cos_sim(
-            query_emb, self.image_embeddings
-        )[0]
+        cos_scores = util.cos_sim(query_emb, self.image_embeddings)[0]
 
         # Convert to numpy if needed (tensor -> cpu -> numpy)
         if hasattr(cos_scores, "cpu"):
-            cos_scores_np: np.ndarray = (
-                cos_scores.cpu().numpy()
-            )
+            cos_scores_np: np.ndarray = cos_scores.cpu().numpy()
         else:
             cos_scores_np = np.asarray(cos_scores)
 
@@ -160,9 +151,7 @@ class SemanticSearcher:
                     id=idx_int,
                     filename=meta["filename"],
                     class_name=meta["class_name"],
-                    score=round(
-                        float(cos_scores_np[idx_int]), 4
-                    ),
+                    score=round(float(cos_scores_np[idx_int]), 4),
                 )
             )
         return results
@@ -194,10 +183,7 @@ def main() -> None:
         "--data-dir",
         type=Path,
         default=DEFAULT_DATA_DIR,
-        help=(
-            "Path to the data directory "
-            "(default: data/eurosat)."
-        ),
+        help=("Path to the data directory " "(default: data/eurosat)."),
     )
     parser.add_argument(
         "--verbose",
@@ -211,9 +197,7 @@ def main() -> None:
         data_dir=args.data_dir,
         model_name=MODEL_NAME,
     )
-    results = searcher.search(
-        query=args.query, top_k=args.top_k
-    )
+    results = searcher.search(query=args.query, top_k=args.top_k)
 
     print(f"\n{'='*60}")
     print(f"  Query : {args.query}")
@@ -224,11 +208,7 @@ def main() -> None:
         print("  No results found.")
     else:
         for rank, r in enumerate(results, start=1):
-            print(
-                f"  {rank}. {r.filename}"
-                f"  (Class: {r.class_name})"
-                f"  -- Score: {r.score}"
-            )
+            print(f"  {rank}. {r.filename}" f"  (Class: {r.class_name})" f"  -- Score: {r.score}")
     print()
 
 
